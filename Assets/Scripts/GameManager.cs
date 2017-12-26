@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,9 +12,11 @@ public class GameManager : MonoBehaviour
     private bool isGameLost;
     private int difficultyLevel;
     private int spawnCount;
+    private int increasingLevelNumber;
 
+    public float Offset;
     public int Points;
-    public int IncreasingLevelNumber;
+    public int IncreasingLevelNumberBase;
     public ObjectPool MyObjectPool;
     public float SpawnCooldown;
     [Range(3.5f, 10)]
@@ -23,18 +27,22 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        gameWidth = Camera.main.orthographicSize - 0.2f;
+        gameWidth = Camera.main.orthographicSize - Offset;
+        increasingLevelNumber = IncreasingLevelNumberBase;
     }
 
     void Update()
     {
+        if (isGameLost)
+            return;
+
         if (timeStamp < Time.time)
         {
-            if (spawnCount == IncreasingLevelNumber)
+            if (spawnCount == increasingLevelNumber)
             {
                 difficultyLevel++;
                 spawnCount = 0;
-                IncreasingLevelNumber += IncreasingLevelNumber / 2;
+                increasingLevelNumber += increasingLevelNumber / 2;
             }
 
             SpawnEnemies();
@@ -44,23 +52,22 @@ public class GameManager : MonoBehaviour
 
     private void SpawnEnemies()
     {
-        if (!isGameLost)
-            for (int i = 0; i < 5; i++)
-            {
-                MovingObject enemy = MyObjectPool.GetPooledObject("enemy");
+        for (int i = 0; i < 5; i++)
+        {
+            MovingObject enemy = MyObjectPool.GetPooledObject("enemy");
 
-                enemy.transform.position = new Vector2(-gameWidth / 2 + i * gameWidth / 4, 2);
-                enemy.gameObject.SetActive(true);
-                SetEnemiesValues(enemy);
-            }
+            enemy.transform.position = new Vector2(-gameWidth / 2 + i * gameWidth / 4, 2);
+            enemy.gameObject.SetActive(true);
+            SetEnemiesValues(enemy.GetComponent<Enemy>());
+        }
         spawnCount++;
     }
 
-    private void SetEnemiesValues(MovingObject enemy)
+    private void SetEnemiesValues(Enemy enemy)
     {
         int i = difficultyLevel + Random.Range(0, 2);
 
-        enemy.GetComponent<Enemy>().SetNewEnemy(EnemiesStats[i]);
+        enemy.SetNewEnemy(EnemiesStats[i]);
     }
 
     public void EndGame()
@@ -76,18 +83,28 @@ public class GameManager : MonoBehaviour
     public void PickupCoin(int v)
     {
         Points += v;
-        PointsText.text = "Points: " + Points;
-    }
+        PointsText.text = string.Format("{0} {1}", "Points", Points);
+    } 
 
     public void SpawnItem(Enemy enemy)
     {
-        // Losowe item TODO
+        float r = Random.Range(0, 1f);
 
-        MovingObject coin = MyObjectPool.GetPooledObject("coin");
-        coin.transform.position = enemy.transform.position;
-        coin.GetComponent<Coin>().Value = enemy.CoinValue;
+        MovingObject item;
 
-        coin.gameObject.SetActive(true);
+        if (enemy.BetterPickupChance > r)
+        {
+            string itemName = enemy.ItemNames[Random.Range(0, enemy.ItemNames.Length - 1)];
+            item = MyObjectPool.GetPooledObject(itemName);
+        }
+        else
+        {
+            item = MyObjectPool.GetPooledObject("coin");
+            item.GetComponent<Coin>().Value = enemy.CoinValue;
+        }    
+
+        item.transform.position = enemy.transform.position;
+        item.gameObject.SetActive(true);
     }
 
     private IEnumerator SlowTime(float time)

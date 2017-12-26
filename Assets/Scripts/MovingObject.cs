@@ -5,7 +5,7 @@ using UnityEngine;
 public class MovingObject : MonoBehaviour
 {
     public bool GoingUp;
-    
+
     protected void CheckIfOutOfBorders()
     {
         if (GoingUp)

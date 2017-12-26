@@ -10,6 +10,7 @@ public class Enemy : MovingObject
     private float healthPoints;
     private float maxHealthPoints;
 
+    public string[] ItemNames;
     public float BetterPickupChance;
     public int CoinValue;
     public float MovementSpeed = 1;
@@ -34,12 +35,13 @@ public class Enemy : MovingObject
         UpdateHealthBar();
     }
 
-    public void SetNewEnemy(EnemyStats so)
+    public void SetNewEnemy(EnemyStats es)
     {
-        maxHealthPoints = so.StartHealthPoints;
-        CoinValue = so.CoinValue;
-        BetterPickupChance = so.BetterPickupChance; 
-        mySpriteRenderer.sprite = so.EnemySprite;
+        maxHealthPoints = es.StartHealthPoints;
+        CoinValue = es.CoinValue;
+        BetterPickupChance = es.BetterPickupChance; 
+        mySpriteRenderer.sprite = es.EnemySprite;
+        ItemNames = es.ItemNames;
 
         GiveVelocity();
         ResetValues();   

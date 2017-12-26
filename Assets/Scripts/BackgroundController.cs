@@ -50,16 +50,16 @@ public class BackgroundController : MonoBehaviour
 
     private void CreatePlanet()
     {
-        MovingObject so = MyObjectPool.GetPooledObject("planet");
+        MovingObject p = MyObjectPool.GetPooledObject("planet");
         
-        so.transform.position = new Vector3(Random.Range(-gameWidth / 2, gameWidth / 2), 3);
+        p.transform.position = new Vector3(Random.Range(-gameWidth / 2, gameWidth / 2), 3);
         float scale = Random.Range(0.2f, 0.4f);
-        so.transform.localScale = new Vector2(scale, scale);
+        p.transform.localScale = new Vector2(scale, scale);
 
-        so.GetComponent<SpriteRenderer>().sprite = Planets[Random.Range(0, Planets.Length)];
-        so.GetComponent<ScrollingObject>().Direction = new Vector2(0, Random.Range(-1f, -0.6f));
+        p.GetComponent<SpriteRenderer>().sprite = Planets[Random.Range(0, Planets.Length)];
+        p.GetComponent<ScrollingObject>().Direction = new Vector2(0, Random.Range(-1f, -0.6f));
 
-        so.gameObject.SetActive(true);
+        p.gameObject.SetActive(true);
     }   
 
     private void ScrollUp()

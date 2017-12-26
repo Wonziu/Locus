@@ -9,4 +9,5 @@ public class EnemyStats : ScriptableObject
     public float BetterPickupChance;
     public Sprite EnemySprite;
     public int CoinValue;
+    public string[] ItemNames;
 }

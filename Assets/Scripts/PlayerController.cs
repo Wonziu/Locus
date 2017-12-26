@@ -8,16 +8,15 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D myRigidbody2D;
     private float speed;
     private float horizontal;
-    private float moveVertical;
     private float fireRate;
 
     public bool CanShot;
     public GameManager MyGameManager;
-    public Transform Muzzle;
+    public Transform[] Muzzle;
     public PlayerStats MyPlayerStat;
     public ObjectPool MyObjectPool;
     public ParticleSystem DeathParticle;
-    public BulletStats MyBulletStat;
+    public WeaponStats MyWeaponStat;
 
     private void Awake()
     {
@@ -33,13 +32,13 @@ public class PlayerController : MonoBehaviour
     {
         speed = MyPlayerStat.PlayerSpeed;
         fireRate = MyPlayerStat.SpeedAttack;
-    }   
+    }
 
     private void Update()
-    {        
+    {
         GetPlayerInput();
 
-        if (CanShot)
+        if (CanShot && Input.GetKey(KeyCode.X))
         {
             StartCoroutine(ShootingCooldown());
             Shoot();
@@ -48,7 +47,7 @@ public class PlayerController : MonoBehaviour
 
     private void GetPlayerInput()
     {
-        horizontal = Input.GetAxis("Horizontal");        
+        horizontal = Input.GetAxis("Horizontal");
     }
 
     private void FixedUpdate()
@@ -59,10 +58,15 @@ public class PlayerController : MonoBehaviour
 
     private void Shoot()
     {
-        MovingObject bullet = MyObjectPool.GetPooledObject("bullet");
-        
-        bullet.transform.position = Muzzle.position;
-        bullet.GetComponent<Bullet>().SetBulletValues(MyBulletStat);
+
+        int count = Mathf.Clamp(MyWeaponStat.BulletAmount, 0, 3);
+
+        for (int i = 0; i < count; i++)
+        {
+            MovingObject bullet = MyObjectPool.GetPooledObject("bullet");
+            bullet.transform.position = Muzzle[i].position;
+            bullet.GetComponent<Bullet>().SetBulletValues(MyWeaponStat);
+        }
     }
 
     private IEnumerator ShootingCooldown()
@@ -73,17 +77,23 @@ public class PlayerController : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D coll)
-    {
-        if (coll.tag == "Enemy")
+    { 
+        switch (coll.tag)
         {
-            MyGameManager.EndGame();
-            Instantiate(DeathParticle, transform.position, Quaternion.identity);   
-            gameObject.SetActive(false);
-        }
-        else if (coll.tag == "Coin")
-        {
-            MyGameManager.PickupCoin(coll.GetComponent<Coin>().Value);
-            coll.gameObject.SetActive(false);
+            case "Enemy":
+                MyGameManager.EndGame();
+                Instantiate(DeathParticle, transform.position, Quaternion.identity);
+                gameObject.SetActive(false);
+                break;
+
+            case "Coin":
+                MyGameManager.PickupCoin(coll.GetComponent<Coin>().Value);
+                coll.gameObject.SetActive(false);
+                break;
+
+            case "Upgrade":
+                MyWeaponStat = coll.GetComponent<WeaponUpgrade>().WeaponStat;
+                break;
         }
     }
 }

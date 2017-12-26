@@ -15,13 +15,13 @@ public class Bullet : MovingObject
         myRigidBody = GetComponent<Rigidbody2D>();
     }
 
-    public void SetBulletValues(BulletStats bs)
+    public void SetBulletValues(WeaponStats ws)
     {
-        mySpriteRenderer.sprite = bs.BulletSprite;
-        Damage = bs.BulletDamage;
+        mySpriteRenderer.sprite = ws.BulletSprite;
+        Damage = ws.BulletDamage;
 
         gameObject.SetActive(true);
-        myRigidBody.velocity = new Vector2(0 , bs.BulletSpeed); 
+        myRigidBody.velocity = new Vector2(0 , ws.BulletSpeed); 
     }
 
     private void Update()
