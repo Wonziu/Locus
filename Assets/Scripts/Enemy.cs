@@ -9,11 +9,14 @@ public class Enemy : MovingObject
     private SpriteRenderer mySpriteRenderer;
     private float healthPoints;
     private float maxHealthPoints;
+    private float movementSpeed = 1;
 
+    [HideInInspector]
     public string[] ItemNames;
+    [HideInInspector]
     public float BetterPickupChance;
+    [HideInInspector]
     public int CoinValue;
-    public float MovementSpeed = 1;
     public Image HealthBar;
     public GameManager MyGameManager;
 
@@ -26,7 +29,7 @@ public class Enemy : MovingObject
 
     private void GiveVelocity()
     {
-        myRigidbody2D.velocity = new Vector2(0, -MovementSpeed);
+        myRigidbody2D.velocity = new Vector2(0, -movementSpeed);
     }
 
     private void ResetValues()

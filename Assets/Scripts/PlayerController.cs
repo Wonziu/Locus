@@ -48,6 +48,8 @@ public class PlayerController : MonoBehaviour
     private void GetPlayerInput()
     {
         horizontal = Input.GetAxis("Horizontal");
+        Debug.Log(horizontal);
+           
     }
 
     private void FixedUpdate()
