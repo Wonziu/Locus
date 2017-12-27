@@ -9,14 +9,17 @@ public class PlayerController : MonoBehaviour
     private float speed;
     private float horizontal;
     private float fireRate;
+    private bool hasShield;
 
     public bool CanShot;
     public GameManager MyGameManager;
+    public Magnet MyMagnet;
     public Transform[] Muzzle;
     public PlayerStats MyPlayerStat;
     public ObjectPool MyObjectPool;
     public ParticleSystem DeathParticle;
     public WeaponStats MyWeaponStat;
+    public int MagnetTime;
 
     private void Awake()
     {
@@ -48,8 +51,17 @@ public class PlayerController : MonoBehaviour
     private void GetPlayerInput()
     {
         horizontal = Input.GetAxis("Horizontal");
-        Debug.Log(horizontal);
-           
+
+        var v3 = Input.mousePosition;
+        v3.z = 10.0f;
+        v3 = Camera.main.ScreenToWorldPoint(v3);
+
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            MovingObject mo = MyObjectPool.GetPooledObject("coin");
+            mo.transform.position = v3;
+            mo.gameObject.SetActive(true);
+        }
     }
 
     private void FixedUpdate()
@@ -82,20 +94,43 @@ public class PlayerController : MonoBehaviour
     { 
         switch (coll.tag)
         {
-            case "Enemy":
-                MyGameManager.EndGame();
-                Instantiate(DeathParticle, transform.position, Quaternion.identity);
-                gameObject.SetActive(false);
-                break;
-
             case "Coin":
                 MyGameManager.PickupCoin(coll.GetComponent<Coin>().Value);
                 coll.gameObject.SetActive(false);
                 break;
 
+            case "Enemy":
+                if (hasShield)
+                {
+                    hasShield = false;
+                    return;
+                }
+
+                MyGameManager.EndGame();
+                Instantiate(DeathParticle, transform.position, Quaternion.identity);
+                gameObject.SetActive(false);
+                break;
+        
+
             case "Upgrade":
                 MyWeaponStat = coll.GetComponent<WeaponUpgrade>().WeaponStat;
                 break;
+
+            case "Magnet":
+                MyMagnet.gameObject.SetActive(true);
+                StartCoroutine(ItemTimer(MagnetTime, MyMagnet.gameObject));
+                coll.gameObject.SetActive(false);
+                break;
+
+            case "Shield":
+                hasShield = true;
+                break;
         }
+    }
+
+    private IEnumerator ItemTimer(int time, GameObject go)
+    {
+        yield return new WaitForSeconds(time);
+        go.SetActive(false);
     }
 }

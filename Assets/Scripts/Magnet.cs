@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Magnet : MonoBehaviour
-{
-    public PlayerController MyPlayer;
+{  
     private List<Pickup> pickUps;
+    private Animator myAnimator;
 
     private void Awake()
     {
         pickUps = new List<Pickup>();
+        myAnimator = GetComponent<Animator>();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         foreach (var pickup in pickUps)
         {
             Vector3 forceDirection = transform.position - pickup.transform.position;            
-            pickup.GetComponent<Rigidbody2D>().AddForce(forceDirection.normalized * Time.fixedDeltaTime);
+            pickup.GetComponent<Rigidbody2D>().velocity = forceDirection.normalized * 4;
         }
     }
 
@@ -26,7 +27,14 @@ public class Magnet : MonoBehaviour
         if (coll.tag == "Coin")
         {
             pickUps.Add(coll.GetComponent<Pickup>());
-            Debug.Log(pickUps);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D coll)
+    {
+        if (coll.tag == "Coin")
+        {
+            pickUps.Remove(coll.GetComponent<Pickup>());
         }
     }
 }
