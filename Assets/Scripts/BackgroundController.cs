@@ -14,7 +14,7 @@ public class BackgroundController : MonoBehaviour
 
     public float Cooldown;
     public Vector2 Direction;
-    public ObjectPool MyObjectPool;
+    public PoolManager MyPoolManager;
     public Sprite[] Planets;
     public float BackgroundSize;
 
@@ -50,7 +50,7 @@ public class BackgroundController : MonoBehaviour
 
     private void CreatePlanet()
     {
-        MovingObject p = MyObjectPool.GetPooledObject("planet");
+        MovingObject p = MyPoolManager.GetPooledObject("planet");
         
         p.transform.position = new Vector3(Random.Range(-gameWidth / 2, gameWidth / 2), 3);
         float scale = Random.Range(0.2f, 0.4f);

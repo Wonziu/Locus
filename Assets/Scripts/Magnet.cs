@@ -5,12 +5,10 @@ using UnityEngine;
 public class Magnet : MonoBehaviour
 {  
     private List<Pickup> pickUps;
-    private Animator myAnimator;
 
     private void Awake()
     {
         pickUps = new List<Pickup>();
-        myAnimator = GetComponent<Animator>();
     }
 
     private void FixedUpdate()
@@ -24,7 +22,7 @@ public class Magnet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D coll)
     {
-        if (coll.tag == "Coin")
+        if (coll.GetComponent<Pickup>())
         {
             pickUps.Add(coll.GetComponent<Pickup>());
         }
@@ -32,7 +30,7 @@ public class Magnet : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D coll)
     {
-        if (coll.tag == "Coin")
+        if (coll.GetComponent<Pickup>())
         {
             pickUps.Remove(coll.GetComponent<Pickup>());
         }

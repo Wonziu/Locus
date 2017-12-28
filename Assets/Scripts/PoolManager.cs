@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectPool : MonoBehaviour
+public class PoolManager : MonoBehaviour
 {
     public List<ObjectPoolItem> Items;
     public Dictionary<string, Queue<MovingObject>> ItemPool;

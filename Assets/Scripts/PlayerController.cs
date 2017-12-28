@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Boo.Lang.Environments;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -9,17 +10,19 @@ public class PlayerController : MonoBehaviour
     private float speed;
     private float horizontal;
     private float fireRate;
-    private bool hasShield;
+    private int lives = 1;
+    private bool isVulnerable = true;
 
     public bool CanShot;
     public GameManager MyGameManager;
     public Magnet MyMagnet;
     public Transform[] Muzzle;
     public PlayerStats MyPlayerStat;
-    public ObjectPool MyObjectPool;
+    public PoolManager MyPoolManager;
     public ParticleSystem DeathParticle;
     public WeaponStats MyWeaponStat;
     public int MagnetTime;
+    public int InvulnerabilityTime;
 
     private void Awake()
     {
@@ -51,17 +54,6 @@ public class PlayerController : MonoBehaviour
     private void GetPlayerInput()
     {
         horizontal = Input.GetAxis("Horizontal");
-
-        var v3 = Input.mousePosition;
-        v3.z = 10.0f;
-        v3 = Camera.main.ScreenToWorldPoint(v3);
-
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            MovingObject mo = MyObjectPool.GetPooledObject("coin");
-            mo.transform.position = v3;
-            mo.gameObject.SetActive(true);
-        }
     }
 
     private void FixedUpdate()
@@ -72,22 +64,14 @@ public class PlayerController : MonoBehaviour
 
     private void Shoot()
     {
-
         int count = Mathf.Clamp(MyWeaponStat.BulletAmount, 0, 3);
 
         for (int i = 0; i < count; i++)
         {
-            MovingObject bullet = MyObjectPool.GetPooledObject("bullet");
+            MovingObject bullet = MyPoolManager.GetPooledObject("bullet");
             bullet.transform.position = Muzzle[i].position;
             bullet.GetComponent<Bullet>().SetBulletValues(MyWeaponStat);
         }
-    }
-
-    private IEnumerator ShootingCooldown()
-    {
-        CanShot = false;
-        yield return new WaitForSeconds(fireRate);
-        CanShot = true;
     }
 
     private void OnTriggerEnter2D(Collider2D coll)
@@ -100,20 +84,23 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case "Enemy":
-                if (hasShield)
-                {
-                    hasShield = false;
+                if (!isVulnerable)
                     return;
-                }
 
-                MyGameManager.EndGame();
-                Instantiate(DeathParticle, transform.position, Quaternion.identity);
-                gameObject.SetActive(false);
+                coll.GetComponent<Enemy>().KillEnemy();
+                lives--;                
+                MyGameManager.UpdateLives(lives);
+
+                if (lives <= 0)
+                    KillPlayer();
+                else 
+                    StartCoroutine(BecomeInvulnerable());
+
                 break;
-        
-
+       
             case "Upgrade":
                 MyWeaponStat = coll.GetComponent<WeaponUpgrade>().WeaponStat;
+                coll.gameObject.SetActive(false);
                 break;
 
             case "Magnet":
@@ -122,15 +109,56 @@ public class PlayerController : MonoBehaviour
                 coll.gameObject.SetActive(false);
                 break;
 
-            case "Shield":
-                hasShield = true;
+            case "Life":
+                coll.gameObject.SetActive(false);
+                lives++;
+                MyGameManager.UpdateLives(lives);
                 break;
         }
+    }
+
+    private void KillPlayer()
+    {
+        MyGameManager.EndGame();
+        MovingObject mo = MyPoolManager.GetPooledObject("playerParticle");
+        mo.transform.position = transform.position;
+        mo.gameObject.SetActive(true);
+        gameObject.SetActive(false);
+    }
+
+    private IEnumerator ShootingCooldown()
+    {
+        CanShot = false;
+        yield return new WaitForSeconds(fireRate);
+        CanShot = true;
     }
 
     private IEnumerator ItemTimer(int time, GameObject go)
     {
         yield return new WaitForSeconds(time);
         go.SetActive(false);
+    }
+
+    private IEnumerator BecomeInvulnerable()
+    {
+        SetVulnerableValues(false, 0.5f);
+
+        float timer = InvulnerabilityTime;
+        
+        while (timer > 0)
+        {
+            timer -= Time.deltaTime; 
+            MyGameManager.UpdateTimer(timer);
+            yield return new WaitForEndOfFrame();
+        }
+
+        SetVulnerableValues(true, 1);
+    }
+
+    private void SetVulnerableValues(bool b, float f)
+    {
+        isVulnerable = b;
+        MyGameManager.TimerText.enabled = !b;
+        GetComponent<SpriteRenderer>().material.color = new Color(1f, 1f, 1f, f); // increaces opacity
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class Enemy : MovingObject
 {
+    private GameManager myGameManager;
     private Rigidbody2D myRigidbody2D;
     private SpriteRenderer mySpriteRenderer;
     private float healthPoints;
@@ -18,13 +19,13 @@ public class Enemy : MovingObject
     [HideInInspector]
     public int CoinValue;
     public Image HealthBar;
-    public GameManager MyGameManager;
+    public ParticleSystem DeathParticle;
 
     private void Awake()
     {
         myRigidbody2D = GetComponent<Rigidbody2D>();
         mySpriteRenderer = GetComponent<SpriteRenderer>();
-        MyGameManager = FindObjectOfType<GameManager>();
+        myGameManager = FindObjectOfType<GameManager>();
     }
 
     private void GiveVelocity()
@@ -61,10 +62,20 @@ public class Enemy : MovingObject
         UpdateHealthBar();
 
         if (healthPoints <= 0)
-        {
-            MyGameManager.SpawnItem(this);
-            gameObject.SetActive(false);
-        }
+            OnEnemyDeath();
+    }
+
+    private void OnEnemyDeath()
+    {
+        myGameManager.SpawnItem(this);
+        myGameManager.SpawnEnemyParticle(this);
+        gameObject.SetActive(false);
+    }
+
+    public void KillEnemy()
+    {
+        UpdateHealthBar();
+        OnEnemyDeath();
     }
 
     private void Update()

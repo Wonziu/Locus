@@ -15,7 +15,7 @@ public class EnemySpawner : MonoBehaviour
     public float SpawnCooldown;
     public float SpecialEnemyChance;
     public int IncreasingLevelNumberBase;
-    public ObjectPool MyObjectPool;
+    public PoolManager MyPoolManager;
     public EnemyStats[] EnemiesStats;
     public EnemyStats[] SpecialEnemiesStats;
 
@@ -49,7 +49,7 @@ public class EnemySpawner : MonoBehaviour
     {
         for (int i = 0; i < 5; i++)
         {
-            MovingObject enemy = MyObjectPool.GetPooledObject("enemy");            
+            MovingObject enemy = MyPoolManager.GetPooledObject("enemy");            
 
             enemy.transform.position = new Vector2(-gameWidth / 2 + i * gameWidth / 4, 2);
             enemy.gameObject.SetActive(true);
