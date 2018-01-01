@@ -8,40 +8,34 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    public EnemySpawner MyEnemySpawner;
-    public int Points;
-    public PoolManager MyPoolManager;
     [Range(3.5f, 10)]
     public float EndTime;
     public bool IsEndSlowed;
-    public Text PointsText;
-    public Text LivesText;
-    public Text TimerText;
+    public int Points;
+    public EnemySpawner MyEnemySpawner;
+    public PoolManager MyPoolManager;
+    public PlayerController MyPlayer;
+    
+    public void PickupCoin(int v)
+    {
+        Points += v;
+        UIManager.Instance.SetPoints(Points);
+    }
 
     public void EndGame()
     {
-        // TODO sprawić żeby po restarcie wszysto się zrestartowało a przeciwnicy znów się spawnowali
-
-        MyEnemySpawner.isGameLost = true;
+        UIManager.Instance.EnableMenu(true);
+        MyEnemySpawner.IsGameLost = true;
 
         if (IsEndSlowed)
             StartCoroutine(SlowTime(EndTime));
     }
 
-    public void PickupCoin(int v)
+    public void RestartGame()
     {
-        Points += v;
-        PointsText.text = string.Format("{0}: {1}", "Points", Points);
-    }
-
-    public void UpdateLives(int l)
-    {
-        LivesText.text = string.Format("{0}: {1}", "Lives", l);
-    }
-
-    public void UpdateTimer(float t)
-    {
-        TimerText.text = (Mathf.Round(t * 10f) / 10f).ToString(CultureInfo.CurrentCulture);
+        Points = 0;
+        MyPlayer.RestartValues();
+        MyEnemySpawner.RestartValues();
     }
 
     public void SpawnItem(Enemy enemy)

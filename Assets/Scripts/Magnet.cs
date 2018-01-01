@@ -23,16 +23,12 @@ public class Magnet : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D coll)
     {
         if (coll.GetComponent<Pickup>())
-        {
             pickUps.Add(coll.GetComponent<Pickup>());
-        }
     }
 
     private void OnTriggerExit2D(Collider2D coll)
     {
         if (coll.GetComponent<Pickup>())
-        {
             pickUps.Remove(coll.GetComponent<Pickup>());
-        }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -10,7 +8,8 @@ public class EnemySpawner : MonoBehaviour
     private float timeStamp;
     private float gameWidth;
 
-    public bool isGameLost;
+    public bool IsGameLost;
+    public float StartCooldown;
     public float Offset;
     public float SpawnCooldown;
     public float SpecialEnemyChance;
@@ -22,13 +21,22 @@ public class EnemySpawner : MonoBehaviour
     private void Start()
     {
         gameWidth = Camera.main.orthographicSize - Offset;
-
+        timeStamp = Time.time + StartCooldown;
         increasingLevelNumber = IncreasingLevelNumberBase;
+    }
+
+    public void RestartValues()
+    {
+        timeStamp = Time.time + StartCooldown;
+        difficultyLevel = 0;
+        spawnCount = 0;
+        increasingLevelNumber = IncreasingLevelNumberBase;
+        IsGameLost = false;
     }
 
     private void Update()
     {
-        if (isGameLost) // or bossfight
+        if (IsGameLost) // or bossfight
             return;
 
         if (timeStamp < Time.time)

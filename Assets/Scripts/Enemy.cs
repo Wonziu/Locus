@@ -61,7 +61,7 @@ public class Enemy : MovingObject
         healthPoints -= d;
         UpdateHealthBar();
 
-        if (healthPoints <= 0)
+        if (healthPoints == 0)
             OnEnemyDeath();
     }
 

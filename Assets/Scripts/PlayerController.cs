@@ -6,11 +6,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private Vector2 startPos;
     private Rigidbody2D myRigidbody2D;
     private float speed;
     private float horizontal;
+    private float timeStamp;
     private float fireRate;
-    private int lives = 1;
     private bool isVulnerable = true;
 
     public bool CanShot;
@@ -22,7 +23,8 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem DeathParticle;
     public WeaponStats MyWeaponStat;
     public int MagnetTime;
-    public int InvulnerabilityTime;
+    public int Lives = 1;
+    public float InvulnerabilityTime;
 
     private void Awake()
     {
@@ -31,7 +33,9 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        startPos = transform.position;
         SetPlayerStats();
+        StartCoroutine(BecomeInvulnerable());
     }
 
     private void SetPlayerStats()
@@ -44,9 +48,9 @@ public class PlayerController : MonoBehaviour
     {
         GetPlayerInput();
 
-        if (CanShot && Input.GetKey(KeyCode.X))
+        if (timeStamp <= Time.time && isVulnerable)
         {
-            StartCoroutine(ShootingCooldown());
+            timeStamp = Time.time + fireRate;
             Shoot();
         }
     }
@@ -75,7 +79,10 @@ public class PlayerController : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D coll)
-    { 
+    {
+        if (!isVulnerable)
+            return;
+
         switch (coll.tag)
         {
             case "Coin":
@@ -83,19 +90,15 @@ public class PlayerController : MonoBehaviour
                 coll.gameObject.SetActive(false);
                 break;
 
-            case "Enemy":
-                if (!isVulnerable)
-                    return;
-
+            case "Enemy":               
                 coll.GetComponent<Enemy>().KillEnemy();
-                lives--;                
-                MyGameManager.UpdateLives(lives);
+                Lives--;
+                UIManager.Instance.UpdateLives(Lives);
 
-                if (lives <= 0)
+                if (Lives <= 0)
                     KillPlayer();
                 else 
                     StartCoroutine(BecomeInvulnerable());
-
                 break;
        
             case "Upgrade":
@@ -104,33 +107,32 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case "Magnet":
-                MyMagnet.gameObject.SetActive(true);
-                StartCoroutine(ItemTimer(MagnetTime, MyMagnet.gameObject));
+                if (!MyMagnet.gameObject.activeInHierarchy)
+                {
+                    MyMagnet.gameObject.SetActive(true);
+                    StartCoroutine(ItemTimer(MagnetTime, MyMagnet.gameObject));
+                }
                 coll.gameObject.SetActive(false);
                 break;
 
             case "Life":
                 coll.gameObject.SetActive(false);
-                lives++;
-                MyGameManager.UpdateLives(lives);
+                Lives++;
+                UIManager.Instance.UpdateLives(Lives);
                 break;
         }
     }
 
     private void KillPlayer()
     {
-        MyGameManager.EndGame();
+        StopAllCoroutines();
+
         MovingObject mo = MyPoolManager.GetPooledObject("playerParticle");
         mo.transform.position = transform.position;
         mo.gameObject.SetActive(true);
-        gameObject.SetActive(false);
-    }
 
-    private IEnumerator ShootingCooldown()
-    {
-        CanShot = false;
-        yield return new WaitForSeconds(fireRate);
-        CanShot = true;
+        gameObject.SetActive(false);
+        MyGameManager.EndGame();
     }
 
     private IEnumerator ItemTimer(int time, GameObject go)
@@ -141,6 +143,7 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator BecomeInvulnerable()
     {
+        MyMagnet.gameObject.SetActive(false);
         SetVulnerableValues(false, 0.5f);
 
         float timer = InvulnerabilityTime;
@@ -148,7 +151,7 @@ public class PlayerController : MonoBehaviour
         while (timer > 0)
         {
             timer -= Time.deltaTime; 
-            MyGameManager.UpdateTimer(timer);
+            UIManager.Instance.UpdateTimer(timer);
             yield return new WaitForEndOfFrame();
         }
 
@@ -158,7 +161,16 @@ public class PlayerController : MonoBehaviour
     private void SetVulnerableValues(bool b, float f)
     {
         isVulnerable = b;
-        MyGameManager.TimerText.enabled = !b;
+        UIManager.Instance.TimerText.enabled = !b;
         GetComponent<SpriteRenderer>().material.color = new Color(1f, 1f, 1f, f); // increaces opacity
+    }
+
+    public void RestartValues()
+    {
+        transform.position = startPos;
+        Lives = 1;
+        gameObject.SetActive(true);
+        StartCoroutine(BecomeInvulnerable());
+        CanShot = true;
     }
 }
