@@ -10,20 +10,20 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D myRigidbody2D;
     private float speed;
     private float horizontal;
-    private float timeStamp;
+    private float magnetTime;
     private float fireRate;
     private bool isVulnerable = true;
+    private CooldownTimer shootingCooldown;
 
-    public bool CanShot;
     public GameManager MyGameManager;
     public Magnet MyMagnet;
     public Transform[] Muzzle;
     public PlayerStats MyPlayerStat;
     public PoolManager MyPoolManager;
-    public ParticleSystem DeathParticle;
     public WeaponStats MyWeaponStat;
     public int MagnetTime;
     public int Lives = 1;
+    public float BonusfireRate;
     public float InvulnerabilityTime;
 
     private void Awake()
@@ -36,6 +36,8 @@ public class PlayerController : MonoBehaviour
         startPos = transform.position;
         SetPlayerStats();
         StartCoroutine(BecomeInvulnerable());
+
+        shootingCooldown = new CooldownTimer(fireRate);
     }
 
     private void SetPlayerStats()
@@ -48,11 +50,8 @@ public class PlayerController : MonoBehaviour
     {
         GetPlayerInput();
 
-        if (timeStamp <= Time.time && isVulnerable)
-        {
-            timeStamp = Time.time + fireRate;
+        if (!shootingCooldown.IsOnCooldown() && isVulnerable)
             Shoot();
-        }
     }
 
     private void GetPlayerInput()
@@ -90,8 +89,10 @@ public class PlayerController : MonoBehaviour
                 coll.gameObject.SetActive(false);
                 break;
 
-            case "Enemy":               
-                coll.GetComponent<Enemy>().KillEnemy();
+            case "Enemy":       
+                if (coll.GetComponent<Enemy>())        
+                    coll.GetComponent<Enemy>().KillEnemy();
+
                 Lives--;
                 UIManager.Instance.UpdateLives(Lives);
 
@@ -99,19 +100,25 @@ public class PlayerController : MonoBehaviour
                     KillPlayer();
                 else 
                     StartCoroutine(BecomeInvulnerable());
+
+                CreateDeathParticle();
                 break;
        
             case "Upgrade":
-                MyWeaponStat = coll.GetComponent<WeaponUpgrade>().WeaponStat;
+                fireRate -= BonusfireRate;
+                shootingCooldown.SetNewCooldown(fireRate);
                 coll.gameObject.SetActive(false);
                 break;
 
             case "Magnet":
+                magnetTime = MagnetTime;
+
                 if (!MyMagnet.gameObject.activeInHierarchy)
                 {
                     MyMagnet.gameObject.SetActive(true);
-                    StartCoroutine(ItemTimer(MagnetTime, MyMagnet.gameObject));
+                    StartCoroutine(MagnetTimer());
                 }
+
                 coll.gameObject.SetActive(false);
                 break;
 
@@ -127,18 +134,26 @@ public class PlayerController : MonoBehaviour
     {
         StopAllCoroutines();
 
-        MovingObject mo = MyPoolManager.GetPooledObject("playerParticle");
-        mo.transform.position = transform.position;
-        mo.gameObject.SetActive(true);
-
         gameObject.SetActive(false);
         MyGameManager.EndGame();
     }
 
-    private IEnumerator ItemTimer(int time, GameObject go)
+    private void CreateDeathParticle()
     {
-        yield return new WaitForSeconds(time);
-        go.SetActive(false);
+        MovingObject mo = MyPoolManager.GetPooledObject("playerParticle");
+        mo.transform.position = transform.position;
+        mo.gameObject.SetActive(true);
+    }
+        
+    private IEnumerator MagnetTimer()
+    {
+        while (magnetTime > 0)
+        {
+            magnetTime -= Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+
+        MyMagnet.gameObject.SetActive(false);
     }
 
     private IEnumerator BecomeInvulnerable()
@@ -171,6 +186,5 @@ public class PlayerController : MonoBehaviour
         Lives = 1;
         gameObject.SetActive(true);
         StartCoroutine(BecomeInvulnerable());
-        CanShot = true;
     }
 }

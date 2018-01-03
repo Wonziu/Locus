@@ -12,20 +12,20 @@ public class GameManager : MonoBehaviour
     public float EndTime;
     public bool IsEndSlowed;
     public int Points;
-    public EnemySpawner MyEnemySpawner;
+    public Spawner MySpawner;
     public PoolManager MyPoolManager;
     public PlayerController MyPlayer;
     
     public void PickupCoin(int v)
     {
         Points += v;
-        UIManager.Instance.SetPoints(Points);
+        UIManager.Instance.UpdatePoints(Points);
     }
 
     public void EndGame()
     {
         UIManager.Instance.EnableMenu(true);
-        MyEnemySpawner.IsGameLost = true;
+        MySpawner.IsGameLost = true;
 
         if (IsEndSlowed)
             StartCoroutine(SlowTime(EndTime));
@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
     {
         Points = 0;
         MyPlayer.RestartValues();
-        MyEnemySpawner.RestartValues();
+        MySpawner.RestartValues();
     }
 
     public void SpawnItem(Enemy enemy)

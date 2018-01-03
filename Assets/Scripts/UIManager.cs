@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
     public Text PointsText;
     public Text LivesText;
     public Text TimerText;
+    public Text WaveCountText;
     public Image Menu;
     public GameManager MyGameManager;
 
@@ -21,9 +22,11 @@ public class UIManager : MonoBehaviour
             Instance = this;
         else if (Instance != this)
             Destroy(gameObject);
+
+        
     }
 
-    public void SetPoints(int p)
+    public void UpdatePoints(int p)
     { 
         PointsText.text = string.Format("{0}: {1}", "Points", p);
     }
@@ -31,6 +34,11 @@ public class UIManager : MonoBehaviour
     public void UpdateLives(int l)
     {
         LivesText.text = string.Format("{0}: {1}", "Lives", l);
+    }
+
+    public void UpdateWaveCount(int c)
+    {
+        WaveCountText.text = string.Format("{0}: {1}", "Wave", c);
     }
 
     public void UpdateTimer(float t)
@@ -51,7 +59,7 @@ public class UIManager : MonoBehaviour
     public void Restart()
     {
         EnableMenu(false);
-        SetPoints(0);
+        UpdatePoints(0);
         UpdateLives(1);
         MyGameManager.RestartGame();
     }

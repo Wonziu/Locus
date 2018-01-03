@@ -28,7 +28,7 @@ public class BackgroundController : MonoBehaviour
             myLayers[i] = transform.GetChild(i);
 
         leftIndex = 0;
-        rightIndex = myLayers.Length - 1;
+        rightIndex = myLayers.Length - 1;   
     }
 
     private void Update()

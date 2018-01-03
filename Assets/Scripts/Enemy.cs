@@ -19,7 +19,6 @@ public class Enemy : MovingObject
     [HideInInspector]
     public int CoinValue;
     public Image HealthBar;
-    public ParticleSystem DeathParticle;
 
     private void Awake()
     {

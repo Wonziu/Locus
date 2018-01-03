@@ -1,37 +1,53 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
-public class EnemySpawner : MonoBehaviour
+public class Spawner : MonoBehaviour
 {
     private int difficultyLevel;
     private int spawnCount;
     private int increasingLevelNumber;
-    private float timeStamp;
     private float gameWidth;
+    private float rocketCooldown;
+    private CooldownTimer spawningEnemyCooldown;
+    private CooldownTimer spawningRocketCooldown;
 
     public bool IsGameLost;
-    public float StartCooldown;
+    public float StartSpawnCooldown;
     public float Offset;
     public float SpawnCooldown;
     public float SpecialEnemyChance;
+    [Range(10, 100)]
+    public int BaseRocketTimer;
     public int IncreasingLevelNumberBase;
     public PoolManager MyPoolManager;
     public EnemyStats[] EnemiesStats;
     public EnemyStats[] SpecialEnemiesStats;
+    public Transform PlayerTransform;
 
     private void Start()
     {
         gameWidth = Camera.main.orthographicSize - Offset;
-        timeStamp = Time.time + StartCooldown;
         increasingLevelNumber = IncreasingLevelNumberBase;
+
+       SetCooldowns(); 
+    }
+
+    private void SetCooldowns()
+    {
+        rocketCooldown = BaseRocketTimer - difficultyLevel / 3 - Random.Range(0, BaseRocketTimer / 2);
+
+        spawningEnemyCooldown = new CooldownTimer(SpawnCooldown, StartSpawnCooldown);
+        spawningRocketCooldown = new CooldownTimer(rocketCooldown);
     }
 
     public void RestartValues()
-    {
-        timeStamp = Time.time + StartCooldown;
+    {        
         difficultyLevel = 0;
         spawnCount = 0;
         increasingLevelNumber = IncreasingLevelNumberBase;
         IsGameLost = false;
+        SetCooldowns();
     }
 
     private void Update()
@@ -39,18 +55,30 @@ public class EnemySpawner : MonoBehaviour
         if (IsGameLost) // or bossfight
             return;
 
-        if (timeStamp < Time.time)
+        if (!spawningEnemyCooldown.IsOnCooldown())
         {
             if (spawnCount == increasingLevelNumber)
             {
                 difficultyLevel++;
                 spawnCount = 0;
-                increasingLevelNumber += increasingLevelNumber / 2;
+                increasingLevelNumber += increasingLevelNumber + 2;
+                UIManager.Instance.UpdateWaveCount(difficultyLevel + 1);
             }
-
             SpawnEnemies();
-            timeStamp = Time.time + SpawnCooldown;
         }
+
+        if (!spawningRocketCooldown.IsOnCooldown())
+            SpawnRocket();
+    }
+
+    private void SpawnRocket()
+    {
+        MovingObject rocket = MyPoolManager.GetPooledObject("rocket");
+        rocket.gameObject.SetActive(true);
+        rocket.transform.position = new Vector2(PlayerTransform.position.x, 2);
+        rocket.GetComponent<Rocket>().SetNewRocket();
+
+        rocketCooldown = BaseRocketTimer - difficultyLevel / 3 - Random.Range(0, BaseRocketTimer / 2) ;
     }
 
     private void SpawnEnemies()
