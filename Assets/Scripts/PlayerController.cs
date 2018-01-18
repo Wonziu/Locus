@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Boo.Lang.Environments;
+using UnityEditorInternal;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -90,8 +91,7 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case "Enemy":       
-                if (coll.GetComponent<Enemy>())        
-                    coll.GetComponent<Enemy>().KillEnemy();
+                coll.GetComponent<Enemy>().KillEnemy();
 
                 Lives--;
                 UIManager.Instance.UpdateLives(Lives);
@@ -103,10 +103,16 @@ public class PlayerController : MonoBehaviour
 
                 CreateDeathParticle();
                 break;
-       
-            case "Upgrade":
+
+            case "Rocket":
+                CreateDeathParticle();
+                KillPlayer();
+                break;
+            
+            case "Upgrade":                
                 fireRate -= BonusfireRate;
                 shootingCooldown.SetNewCooldown(fireRate);
+                UIManager.Instance.UpdateBonusSpeedAttack(BonusfireRate);
                 coll.gameObject.SetActive(false);
                 break;
 
@@ -177,7 +183,7 @@ public class PlayerController : MonoBehaviour
     {
         isVulnerable = b;
         UIManager.Instance.TimerText.enabled = !b;
-        GetComponent<SpriteRenderer>().material.color = new Color(1f, 1f, 1f, f); // increaces opacity
+        GetComponent<SpriteRenderer>().material.color = new Color(1f, 1f, 1f, f); // increaces and decreases opacity
     }
 
     public void RestartValues()

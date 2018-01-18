@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
     public Text PointsText;
     public Text LivesText;
     public Text TimerText;
+    public Text BonusSAText;
     public Text WaveCountText;
     public Image Menu;
     public GameManager MyGameManager;
@@ -22,8 +23,6 @@ public class UIManager : MonoBehaviour
             Instance = this;
         else if (Instance != this)
             Destroy(gameObject);
-
-        
     }
 
     public void UpdatePoints(int p)
@@ -44,6 +43,11 @@ public class UIManager : MonoBehaviour
     public void UpdateTimer(float t)
     {
         TimerText.text = (Mathf.Round(t * 10f) / 10f).ToString(CultureInfo.CurrentCulture);
+    }
+
+    public void UpdateBonusSpeedAttack(float i)
+    {
+        BonusSAText.text = string.Format("{0}: {1}", "SA bonus", i);
     }
 
     public void EnableMenu(bool b)
