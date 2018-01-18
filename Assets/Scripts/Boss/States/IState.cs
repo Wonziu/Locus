@@ -6,5 +6,6 @@ public interface IState<in T>
 {
     void EnterState(T owner);
     void UpdateState(T owner);
+    void UpdateInFixedState(T owner);
     void ExitState(T owner);
 }

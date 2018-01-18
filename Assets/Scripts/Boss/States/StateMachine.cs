@@ -27,4 +27,10 @@ public class StateMachine<T>
         if (currentState != null)
             currentState.UpdateState(Owner);
     }
+
+    public void FixedUpdateState()
+    {
+        if (currentState != null)
+            currentState.UpdateInFixedState(Owner);
+    }
 }

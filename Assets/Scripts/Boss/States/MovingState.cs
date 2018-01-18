@@ -4,18 +4,45 @@ using UnityEngine;
 
 public class MovingState : IState<Boss>
 {
+    private Vector3 startPos;
+    private Vector3 destinationPoint;
+  
+    private Vector3 direction;
+    private float percentBetweenwaypoints;
+    private float distance;
+    private float movementSpeed;
+
     public void EnterState(Boss owner)
     {
-        Debug.Log("Wszedłem ruszam");
+        startPos = owner.transform.position;
+        destinationPoint = owner.EndPosition;
+        movementSpeed = owner.MovementSpeed;
+        GetDirection();
     }
 
     public void UpdateState(Boss owner)
     {
-        Debug.Log("Update ruszam");
+       GetDirection();
+
+        if (percentBetweenwaypoints >= 1)
+            owner.MyStateMachine.ChangeState(null);
+    }
+
+    private void GetDirection()
+    {
+        distance = Vector2.Distance(startPos, destinationPoint);
+        percentBetweenwaypoints += Time.deltaTime * movementSpeed / distance;
+        percentBetweenwaypoints = Mathf.Clamp01(percentBetweenwaypoints);
+        direction = Vector2.Lerp(startPos, destinationPoint, percentBetweenwaypoints);
+    }
+
+    public void UpdateInFixedState(Boss owner)
+    {
+        owner.MyRigidbody2D.MovePosition(direction);
     }
 
     public void ExitState(Boss owner)
     {
-        Debug.Log("Wyszedłem ruszam");
+        
     }
 }
