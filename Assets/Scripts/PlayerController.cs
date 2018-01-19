@@ -16,12 +16,13 @@ public class PlayerController : MonoBehaviour
     private bool isVulnerable = true;
     private CooldownTimer shootingCooldown;
 
+    public Weapon MyWeapon;
     public GameManager MyGameManager;
     public Magnet MyMagnet;
-    public Transform[] Muzzle;
+    
     public PlayerStats MyPlayerStat;
     public PoolManager MyPoolManager;
-    public WeaponStats MyWeaponStat;
+    public WeaponStats MyWeaponStats;
     public int MagnetTime;
     public int Lives = 1;
     public float BonusfireRate;
@@ -52,7 +53,7 @@ public class PlayerController : MonoBehaviour
         GetPlayerInput();
 
         if (!shootingCooldown.IsOnCooldown() && isVulnerable)
-            Shoot();
+            MyWeapon.Shoot(MyWeaponStats);
     }
 
     private void GetPlayerInput()
@@ -64,18 +65,6 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 movement = new Vector3(horizontal, 0);
         myRigidbody2D.velocity = movement * speed;
-    }
-
-    private void Shoot()
-    {
-        int count = Mathf.Clamp(MyWeaponStat.BulletAmount, 0, 3);
-
-        for (int i = 0; i < count; i++)
-        {
-            MovingObject bullet = MyPoolManager.GetPooledObject("bullet");
-            bullet.transform.position = Muzzle[i].position;
-            bullet.GetComponent<Bullet>().SetBulletValues(MyWeaponStat);
-        }
     }
 
     private void OnTriggerEnter2D(Collider2D coll)

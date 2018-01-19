@@ -6,23 +6,24 @@ public class FirstBoss : Boss
 {
     private void Awake()
     {
-        MyRigidbody2D = GetComponent<Rigidbody2D>();
-        MyStateMachine = new StateMachine<Boss>(this);
+        BossRigidbody2D = GetComponent<Rigidbody2D>();
+        BossStateMachine = new StateMachine<Boss>(this);
     }
 
-    private void Start()
+    protected override void Start()
     {
-        NextState = new MovingState();
-        MyStateMachine.ChangeState(new MovingState());     
+        base.Start();
+        NextState = new ShootingState();
+        BossStateMachine.ChangeState(new MovingState());     
     }
 
     private void Update()
     {
-        MyStateMachine.UpdateState();
+        BossStateMachine.UpdateState();
     }
 
     private void FixedUpdate()
     {
-        MyStateMachine.FixedUpdateState();
-    }
+        BossStateMachine.FixedUpdateState();
+    }  
 }

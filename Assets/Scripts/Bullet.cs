@@ -21,7 +21,7 @@ public class Bullet : MovingObject
         Damage = ws.BulletDamage;
 
         gameObject.SetActive(true);
-        myRigidBody.velocity = new Vector2(0 , ws.BulletSpeed); 
+        myRigidBody.velocity = transform.up * ws.BulletSpeed; 
     }
 
     private void Update()
