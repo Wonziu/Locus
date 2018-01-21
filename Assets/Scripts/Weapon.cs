@@ -5,7 +5,6 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
     private List<Transform> Muzzles;
-    public PoolManager MyPoolManager;
 
     private void Start()
     {
@@ -21,7 +20,7 @@ public class Weapon : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            MovingObject bullet = MyPoolManager.GetPooledObject("bullet");
+            MovingObject bullet = PoolManager.Instance.GetPooledObject("bullet");
             bullet.transform.position = Muzzles[i].position;
             bullet.transform.rotation = Muzzles[i].rotation;
             bullet.GetComponent<Bullet>().SetBulletValues(ws);

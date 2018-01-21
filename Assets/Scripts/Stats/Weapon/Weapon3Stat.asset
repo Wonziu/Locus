@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dde5d087d1d3a37488d1e76d18803319, type: 3}
+  m_Name: Weapon3Stat
+  m_EditorClassIdentifier: 
+  BulletSprite: {fileID: 21300000, guid: c05e8171e1e97804ea3c456f394ba25a, type: 3}
+  BulletDamage: 1
+  BulletSpeed: 3
+  BulletAmount: 3
+  BulletTag: BulletPlayer

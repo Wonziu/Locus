@@ -13,6 +13,7 @@ TagManager:
   - Rocket
   - BulletPlayer
   - BulletBoss
+  - WeaponUpgrade
   layers:
   - Default
   - TransparentFX

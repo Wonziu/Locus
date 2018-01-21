@@ -19,7 +19,7 @@ public class ShootingState : IState<Boss>
             owner.BossWeapon.Shoot(owner.BossWeaponStats);
             bulletCount++;
 
-            if (bulletCount >= owner.ShootsToChangeState)
+            if (bulletCount >= owner.MyBossStats.ShootsToChangeState)
             {
                 owner.BossStateMachine.ChangeState(new SpawingState());
             }

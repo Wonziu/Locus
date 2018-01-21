@@ -17,10 +17,7 @@ public class Enemy : HostileCharacter
         base.Awake();
         mySpriteRenderer = GetComponent<SpriteRenderer>();
 
-        OnDeath = () =>
-        {
-            myGameManager.SpawnItem(this);
-        };
+        OnDeath = SpawnItem;
     }
 
     private void GiveVelocity()
@@ -44,6 +41,27 @@ public class Enemy : HostileCharacter
 
         GiveVelocity();
         ResetValues();   
+    }
+
+    public void SpawnItem()
+    {
+        float r = Random.Range(0, 1f);
+
+        MovingObject item;
+
+        if (BetterPickupChance > r)
+        {
+            string itemName = ItemNames[Random.Range(0, ItemNames.Length)];
+            item = PoolManager.Instance.GetPooledObject(itemName);
+        }
+        else
+        {
+            item = PoolManager.Instance.GetPooledObject("coin");
+            item.GetComponent<Coin>().Value = CoinValue;
+        }
+
+        item.transform.position = transform.position;
+        item.gameObject.SetActive(true);
     }
 
     private void Update()

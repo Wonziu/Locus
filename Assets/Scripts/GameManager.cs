@@ -13,7 +13,6 @@ public class GameManager : MonoBehaviour
     public bool IsEndSlowed;
     public int Points;
     public Spawner MySpawner;
-    public PoolManager MyPoolManager;
     public PlayerController MyPlayer;
     
     public void PickupCoin(int v)
@@ -36,34 +35,6 @@ public class GameManager : MonoBehaviour
         Points = 0;
         MyPlayer.RestartValues();
         MySpawner.RestartValues();
-    }
-
-    public void SpawnItem(Enemy enemy)
-    {
-        float r = Random.Range(0, 1f);
-
-        MovingObject item;
-
-        if (enemy.BetterPickupChance > r)
-        {
-            string itemName = enemy.ItemNames[Random.Range(0, enemy.ItemNames.Length)];
-            item = MyPoolManager.GetPooledObject(itemName);
-        }
-        else
-        {
-            item = MyPoolManager.GetPooledObject("coin");
-            item.GetComponent<Coin>().Value = enemy.CoinValue;
-        }    
-      
-        item.transform.position = enemy.transform.position;
-        item.gameObject.SetActive(true);
-    }
-
-    public void SpawnParticle(Vector3 enemyPos, string particleName)
-    {
-        MovingObject particle = MyPoolManager.GetPooledObject(particleName);
-        particle.transform.position = enemyPos;
-        particle.gameObject.SetActive(true);
     }
 
     private IEnumerator SlowTime(float time)

@@ -7,6 +7,15 @@ public class PoolManager : MonoBehaviour
 {
     public List<ObjectPoolItem> Items;
     public Dictionary<string, Queue<MovingObject>> ItemPool;
+    public static PoolManager Instance = null;
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else if (Instance != this)
+            Destroy(gameObject);
+    }
 
     private void Start()
     {

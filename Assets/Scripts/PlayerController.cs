@@ -21,7 +21,6 @@ public class PlayerController : MonoBehaviour
     public Magnet MyMagnet;
     
     public PlayerStats MyPlayerStat;
-    public PoolManager MyPoolManager;
     public WeaponStats MyWeaponStats;
     public int MagnetTime;
     public int Lives = 1;
@@ -79,6 +78,7 @@ public class PlayerController : MonoBehaviour
                 coll.gameObject.SetActive(false);
                 break;
 
+            case "BulletBoss":
             case "Enemy":       
                 Lives--;
                 UIManager.Instance.UpdateLives(Lives);
@@ -90,8 +90,7 @@ public class PlayerController : MonoBehaviour
 
                 CreateDeathParticle();
                 break;
-
-            case "BulletBoss":
+            
             case "Rocket":
                 CreateDeathParticle();
                 KillPlayer();
@@ -117,24 +116,30 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case "Life":
-                coll.gameObject.SetActive(false);
                 Lives++;
                 UIManager.Instance.UpdateLives(Lives);
+                coll.gameObject.SetActive(false);
                 break;
+
+            case "WeaponUpgrade":
+                MyWeaponStats = coll.GetComponent<WeaponUpgrade>().WeaponStat;
+                SetPlayerStats();
+                coll.gameObject.SetActive(false);
+                break;                
         }
     }
 
     private void KillPlayer()
     {
         StopAllCoroutines();
-
+        
         gameObject.SetActive(false);
         MyGameManager.EndGame();
     }
 
     private void CreateDeathParticle()
     {
-        MovingObject mo = MyPoolManager.GetPooledObject("playerParticle");
+        MovingObject mo = PoolManager.Instance.GetPooledObject("playerParticle");
         mo.transform.position = transform.position;
         mo.gameObject.SetActive(true);
     }

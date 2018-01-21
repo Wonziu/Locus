@@ -6,8 +6,7 @@ using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class HostileCharacter : MovingObject
-{
-    protected GameManager myGameManager;
+{  
     protected int healthPoints;
     protected int maxHealthPoints;
 
@@ -17,8 +16,7 @@ public class HostileCharacter : MovingObject
     [HideInInspector] public Rigidbody2D MyRigidbody2D;
 
     protected void Awake()
-    {
-        myGameManager = FindObjectOfType<GameManager>();
+    {        
         MyRigidbody2D = GetComponent<Rigidbody2D>();
     }
 
@@ -42,8 +40,15 @@ public class HostileCharacter : MovingObject
 
     protected void KillEnemy()
     {
-        myGameManager.SpawnParticle(transform.position, ParticleName);
+        SpawnParticle();
         gameObject.SetActive(false);
+    }
+
+    protected void SpawnParticle()
+    {
+        MovingObject particle = PoolManager.Instance.GetPooledObject(ParticleName);
+        particle.transform.position = transform.position;
+        particle.gameObject.SetActive(true);
     }
 
     private void OnTriggerEnter2D(Collider2D coll)

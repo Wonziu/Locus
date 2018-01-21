@@ -4,6 +4,7 @@ using Random = UnityEngine.Random;
 
 public class Spawner : MonoBehaviour
 {
+    private bool bossFight;
     private int difficultyLevel;
     private int spawnCount;
     private int increasingLevelNumber;
@@ -11,6 +12,7 @@ public class Spawner : MonoBehaviour
     private float rocketCooldown;
     private CooldownTimer spawningEnemyCooldown;
     private CooldownTimer spawningRocketCooldown;
+    private int bossCount;
 
     public bool IsGameLost;
     public float StartSpawnCooldown;
@@ -20,10 +22,11 @@ public class Spawner : MonoBehaviour
     [Range(10, 100)]
     public int BaseRocketTimer;
     public int IncreasingLevelNumberBase;
-    public PoolManager MyPoolManager;
     public EnemyStats[] EnemiesStats;
     public EnemyStats[] SpecialEnemiesStats;
     public Transform PlayerTransform;
+    public Vector3 BossPosition;
+    public string[] BossNames;
 
     private void Start()
     {
@@ -52,20 +55,27 @@ public class Spawner : MonoBehaviour
 
     private void Update()
     {
-        if (IsGameLost) // or bossfight
+        if (IsGameLost || bossFight) // or bossfight
             return;
 
         if (!spawningEnemyCooldown.IsOnCooldown()) 
         {
+            SpawnEnemies();
+            spawnCount++;
+
             if (spawnCount == increasingLevelNumber)
             {
                 difficultyLevel++;
                 spawnCount = 0;
-                increasingLevelNumber += increasingLevelNumber + 2;
                 UIManager.Instance.UpdateWaveCount(difficultyLevel + 1);
+
+                if ((difficultyLevel + 1) % 3 == 0)
+                {
+                    bossFight = true;
+                    SpawnBoss();
+                    bossCount++;
+                }
             }
-            SpawnEnemies();
-            spawnCount++;
         }
 
         if (!spawningRocketCooldown.IsOnCooldown())
@@ -75,9 +85,24 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    private void SpawnBoss()
+    {
+        MovingObject boss = PoolManager.Instance.GetPooledObject(BossNames[bossCount]);
+        boss.transform.position = BossPosition;
+        boss.GetComponent<Boss>().MySpawner = this;
+        boss.GetComponent<Boss>().PlayerTransform = PlayerTransform;
+        boss.gameObject.SetActive(true);
+    }
+
+    public void EndBossFight()
+    {
+        bossFight = false;
+        spawningEnemyCooldown.AddCooldown(3);
+    }
+
     public void SpawnRocket(Vector3 pos)
     {
-        MovingObject rocket = MyPoolManager.GetPooledObject("rocket");
+        MovingObject rocket = PoolManager.Instance.GetPooledObject("rocket");
         rocket.transform.position = pos;
         rocket.gameObject.SetActive(true);
         rocket.GetComponent<Rocket>().SetNewRocket();
@@ -87,7 +112,7 @@ public class Spawner : MonoBehaviour
     {
         for (int i = 0; i < 5; i++)
         {
-            MovingObject enemy = MyPoolManager.GetPooledObject("enemy");            
+            MovingObject enemy = PoolManager.Instance.GetPooledObject("enemy");            
 
             enemy.transform.position = new Vector2(-gameWidth / 2 + i * gameWidth / 4, 2);
             enemy.gameObject.SetActive(true);
