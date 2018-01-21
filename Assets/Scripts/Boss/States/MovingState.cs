@@ -6,7 +6,6 @@ public class MovingState : IState<Boss>
 {
     private Vector3 startPos;
     private Vector3 destinationPoint;
-  
     private Vector3 direction;
     private float percentBetweenwaypoints;
     private float distance;
@@ -22,7 +21,8 @@ public class MovingState : IState<Boss>
 
     public void UpdateState(Boss owner)
     {
-       GetDirection();
+        
+        GetDirection();
 
         if (percentBetweenwaypoints >= 1)
             owner.BossStateMachine.ChangeState(owner.NextState);
@@ -38,11 +38,6 @@ public class MovingState : IState<Boss>
 
     public void UpdateInFixedState(Boss owner)
     {
-        owner.BossRigidbody2D.MovePosition(direction);
-    }
-
-    public void ExitState(Boss owner)
-    {
-        
+        owner.MyRigidbody2D.MovePosition(direction);
     }
 }

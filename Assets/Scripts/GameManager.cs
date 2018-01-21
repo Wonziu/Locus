@@ -59,10 +59,10 @@ public class GameManager : MonoBehaviour
         item.gameObject.SetActive(true);
     }
 
-    public void SpawnEnemyParticle(Enemy enemy)
+    public void SpawnParticle(Vector3 enemyPos, string particleName)
     {
-        MovingObject particle = MyPoolManager.GetPooledObject("enemyParticle");
-        particle.transform.position = enemy.transform.position;
+        MovingObject particle = MyPoolManager.GetPooledObject(particleName);
+        particle.transform.position = enemyPos;
         particle.gameObject.SetActive(true);
     }
 

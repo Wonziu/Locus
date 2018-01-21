@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc998ad3769f475418921aaff014f8fc, type: 3}
   m_Name: Package2Stats
   m_EditorClassIdentifier: 
-  StartHealthPoints: 5
+  StartHealthPoints: 3
   BetterPickupChance: 1
   EnemySprite: {fileID: 21300000, guid: 4c8a2444f139c1447b5bd181110e264b, type: 3}
   CoinValue: 1

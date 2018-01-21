@@ -80,8 +80,6 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case "Enemy":       
-                coll.GetComponent<Enemy>().KillEnemy();
-
                 Lives--;
                 UIManager.Instance.UpdateLives(Lives);
 
@@ -93,6 +91,7 @@ public class PlayerController : MonoBehaviour
                 CreateDeathParticle();
                 break;
 
+            case "BulletBoss":
             case "Rocket":
                 CreateDeathParticle();
                 KillPlayer();

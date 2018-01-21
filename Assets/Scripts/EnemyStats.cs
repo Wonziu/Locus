@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu]
 public class EnemyStats : ScriptableObject
 {
-    public float StartHealthPoints;
+    public int StartHealthPoints;
     public float BetterPickupChance;
     public Sprite EnemySprite;
     public int CoinValue;

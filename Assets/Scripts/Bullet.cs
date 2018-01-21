@@ -19,7 +19,7 @@ public class Bullet : MovingObject
     {
         mySpriteRenderer.sprite = ws.BulletSprite;
         Damage = ws.BulletDamage;
-
+        transform.tag = ws.BulletTag;
         gameObject.SetActive(true);
         myRigidBody.velocity = transform.up * ws.BulletSpeed; 
     }

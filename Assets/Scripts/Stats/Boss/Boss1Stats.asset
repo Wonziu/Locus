@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Name: Boss1Stats
   m_EditorClassIdentifier: 
   Name: The Destroyer
-  StartHealthPoints: 40
+  StartHealthPoints: 100
   Pickup: {fileID: 0}
   MovementSpeed: 0.5
   AttackRate: 0.2
+  SpawningRocketsRate: 0.7
+  SpawningEnemiesRate: 1.5
+  RocketAmount: 1

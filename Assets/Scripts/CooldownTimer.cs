@@ -19,6 +19,11 @@ public class CooldownTimer
         timeStamp = Time.time + startTimer;
     }
 
+    public void AddCooldown(float f)
+    {
+        timeStamp = Time.time + f + cooldownTime;
+    }
+
     public void SetNewCooldown(float f)
     {
         cooldownTime = f;

@@ -10,4 +10,7 @@ public class BossStats : ScriptableObject
     public Pickup Pickup;
     public float MovementSpeed;
     public float AttackRate;
+    public float SpawningRocketsRate;
+    public float SpawningEnemiesRate;
+    public int RocketAmount;
 }

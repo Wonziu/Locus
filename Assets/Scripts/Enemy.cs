@@ -3,33 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Enemy : MovingObject
-{
-    private GameManager myGameManager;
-    private Rigidbody2D myRigidbody2D;
-    private SpriteRenderer mySpriteRenderer;
-    private float healthPoints;
-    private float maxHealthPoints;
+public class Enemy : HostileCharacter
+{ 
+    private SpriteRenderer mySpriteRenderer;    
     private float movementSpeed = 1;
 
-    [HideInInspector]
-    public string[] ItemNames;
-    [HideInInspector]
-    public float BetterPickupChance;
-    [HideInInspector]
-    public int CoinValue;
-    public Image HealthBar;
-
-    private void Awake()
+    [HideInInspector] public string[] ItemNames;
+    [HideInInspector] public float BetterPickupChance;
+    [HideInInspector] public int CoinValue;
+    
+    private new void Awake()
     {
-        myRigidbody2D = GetComponent<Rigidbody2D>();
+        base.Awake();
         mySpriteRenderer = GetComponent<SpriteRenderer>();
-        myGameManager = FindObjectOfType<GameManager>();
+
+        OnDeath = () =>
+        {
+            myGameManager.SpawnItem(this);
+        };
     }
 
     private void GiveVelocity()
     {
-        myRigidbody2D.velocity = new Vector2(0, -movementSpeed);
+        MyRigidbody2D.velocity = new Vector2(0, -movementSpeed);
     }
 
     private void ResetValues()
@@ -50,44 +46,8 @@ public class Enemy : MovingObject
         ResetValues();   
     }
 
-    private void UpdateHealthBar()
-    {
-        HealthBar.fillAmount = healthPoints / maxHealthPoints;
-    }
-
-    public void TakeDamage(int d)
-    {
-        healthPoints -= d;
-        UpdateHealthBar();
-
-        if (healthPoints == 0)
-            OnEnemyDeath();
-    }
-
-    private void OnEnemyDeath()
-    {
-        myGameManager.SpawnItem(this);
-        myGameManager.SpawnEnemyParticle(this);
-        gameObject.SetActive(false);
-    }
-
-    public void KillEnemy()
-    {
-        UpdateHealthBar();
-        OnEnemyDeath();
-    }
-
     private void Update()
     {
         CheckIfOutOfBorders();
-    }
-
-    private void OnTriggerEnter2D(Collider2D coll)
-    {
-        if (coll.tag == "Bullet")
-        {
-            TakeDamage(coll.GetComponent<Bullet>().Damage);            
-            coll.gameObject.SetActive(false);
-        }
     }
 }

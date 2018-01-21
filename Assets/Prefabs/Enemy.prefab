@@ -205,6 +205,7 @@ MonoBehaviour:
   BetterPickupChance: 0
   CoinValue: 0
   HealthBar: {fileID: 114368787574053488}
+  ParticleName: enemyParticle
 --- !u!114 &114468951296841810
 MonoBehaviour:
   m_ObjectHideFlags: 1

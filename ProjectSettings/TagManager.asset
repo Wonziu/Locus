@@ -5,13 +5,14 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
-  - Bullet
   - Coin
   - Boundary
   - Magnet
   - Life
   - Upgrade
   - Rocket
+  - BulletPlayer
+  - BulletBoss
   layers:
   - Default
   - TransparentFX

@@ -55,7 +55,7 @@ public class Spawner : MonoBehaviour
         if (IsGameLost) // or bossfight
             return;
 
-        if (!spawningEnemyCooldown.IsOnCooldown())
+        if (!spawningEnemyCooldown.IsOnCooldown()) 
         {
             if (spawnCount == increasingLevelNumber)
             {
@@ -65,23 +65,25 @@ public class Spawner : MonoBehaviour
                 UIManager.Instance.UpdateWaveCount(difficultyLevel + 1);
             }
             SpawnEnemies();
+            spawnCount++;
         }
 
         if (!spawningRocketCooldown.IsOnCooldown())
-            SpawnRocket();
+        {
+            SpawnRocket(new Vector3(PlayerTransform.position.x, 2));
+            rocketCooldown = BaseRocketTimer - difficultyLevel / 3 - Random.Range(0, BaseRocketTimer / 2);
+        }
     }
 
-    private void SpawnRocket()
+    public void SpawnRocket(Vector3 pos)
     {
         MovingObject rocket = MyPoolManager.GetPooledObject("rocket");
+        rocket.transform.position = pos;
         rocket.gameObject.SetActive(true);
-        rocket.transform.position = new Vector2(PlayerTransform.position.x, 2);
         rocket.GetComponent<Rocket>().SetNewRocket();
-
-        rocketCooldown = BaseRocketTimer - difficultyLevel / 3 - Random.Range(0, BaseRocketTimer / 2) ;
     }
 
-    private void SpawnEnemies()
+    public void SpawnEnemies()
     {
         for (int i = 0; i < 5; i++)
         {
@@ -90,8 +92,7 @@ public class Spawner : MonoBehaviour
             enemy.transform.position = new Vector2(-gameWidth / 2 + i * gameWidth / 4, 2);
             enemy.gameObject.SetActive(true);
             SetEnemiesValues(enemy.GetComponent<Enemy>());
-        }
-        spawnCount++;
+        }       
     }
 
     private void SetEnemiesValues(Enemy enemy)

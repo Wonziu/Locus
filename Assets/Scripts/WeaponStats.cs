@@ -9,4 +9,5 @@ public class WeaponStats : ScriptableObject
     public int BulletDamage;
     public float BulletSpeed;
     public int BulletAmount;
+    public string BulletTag;
 }
